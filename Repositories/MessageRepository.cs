@@ -1,4 +1,4 @@
-using Infrastructure.Common.Models;
+using Koala.MessageConsumerService.Models;
 using Koala.MessageConsumerService.Options;
 using Koala.MessageConsumerService.Repositories.Interfaces;
 using Microsoft.Extensions.Options;
@@ -16,8 +16,8 @@ public class MessageRepository : IMessageRepository
         _database = client.GetDatabase(settings.Value.Database);
     }
 
-    public async Task AddMessageAsync(BaseMessage message)
+    public async Task AddMessageAsync(Message message)
     {
-        await _database.GetCollection<BaseMessage>("Messages").InsertOneAsync(message);
+        await _database.GetCollection<Message>("Messages").InsertOneAsync(message);
     }
 }

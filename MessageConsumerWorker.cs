@@ -1,7 +1,6 @@
-using Infrastructure.Common.Constants;
-using Infrastructure.Common.Models;
 using Infrastructure.Messaging.Handlers;
 using Infrastructure.Messaging.Handlers.Interfaces;
+using Koala.MessageConsumerService.Models;
 using Koala.MessageConsumerService.Repositories.Interfaces;
 using Microsoft.Extensions.Hosting;
 using Serilog;
@@ -37,9 +36,9 @@ public class MessageConsumerWorker : IHostedService, IMessageHandlerCallback
         {
             switch (messageType)
             {
-                case MessageTypes.MessageReceived:
+                case "MESSAGE_RECEIVED":
                     var messageObject = JsonMessageSerializerHandler.Deserialize(message);
-                    var baseMessageObject = messageObject.ToObject<BaseMessage>();
+                    var baseMessageObject = messageObject.ToObject<Message>();
 
                     if (baseMessageObject is null)
                     {
