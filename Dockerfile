@@ -1,18 +1,16 @@
-﻿FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/runtime:6.0-bullseye-slim AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0-bullseye-slim AS build
 WORKDIR /src
-COPY ["MessageConsumerService/MessageConsumerService.csproj", "MessageConsumerService/"]
-COPY ["Infrastructure.Messaging/Infrastructure.Messaging.csproj", "Infrastructure.Messaging/"]
-COPY ["Infrastructure.Common/Infrastructure.Common.csproj", "Infrastructure.Common/"]
-RUN dotnet restore "MessageConsumerService/MessageConsumerService.csproj"
+COPY ["Koala.Messaging.Consumer.Service.csproj", "./"]
+RUN dotnet restore "Koala.Messaging.Consumer.Service.csproj"
 COPY . .
-WORKDIR "/src/MessageConsumerService"
-RUN dotnet build "MessageConsumerService.csproj" -c Release -o /app/build
+WORKDIR "/src"
+RUN dotnet build "Koala.Messaging.Consumer.Service.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "MessageConsumerService.csproj" -c Release -o /app/publish
+RUN dotnet publish "Koala.Messaging.Consumer.Service.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
