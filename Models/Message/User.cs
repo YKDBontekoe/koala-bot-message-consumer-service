@@ -1,4 +1,4 @@
-﻿namespace Koala.MessageConsumerService.Models;
+﻿namespace Koala.MessageConsumerService.Models.Message;
 
 public class User
 {

@@ -1,4 +1,4 @@
-using Koala.MessageConsumerService.Models;
+using Koala.MessageConsumerService.Models.Message;
 using Koala.MessageConsumerService.Repositories.Interfaces;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
