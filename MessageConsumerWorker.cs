@@ -1,64 +1,30 @@
-using Infrastructure.Messaging.Handlers;
-using Infrastructure.Messaging.Handlers.Interfaces;
-using Koala.MessageConsumerService.Models;
 using Koala.MessageConsumerService.Repositories.Interfaces;
 using Microsoft.Extensions.Hosting;
-using Serilog;
 
 namespace Koala.MessageConsumerService;
 
-public class MessageConsumerWorker : IHostedService, IMessageHandlerCallback 
+public class MessageConsumerWorker : IHostedService, IDisposable
 {
-    private readonly IMessageRepository _messageRepository;
-    private readonly IMessageHandler _messageHandler;
+    private readonly IServiceBusConsumer _serviceBusConsumer;
 
-    public MessageConsumerWorker(IMessageHandler messageHandler, IMessageRepository messageRepository)
+    public MessageConsumerWorker(IServiceBusConsumer serviceBusConsumer)
     {
-        _messageHandler = messageHandler;
-        _messageRepository = messageRepository;
+        _serviceBusConsumer = serviceBusConsumer;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _messageHandler.Start(this);
-        return Task.CompletedTask;
+        await _serviceBusConsumer.RegisterOnMessageHandlerAndReceiveMessages();
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        _messageHandler.Stop();
-        return Task.CompletedTask;
+        await _serviceBusConsumer.DisposeAsync()!;
+        await _serviceBusConsumer.CloseQueueAsync()!;
     }
 
-    public Task<bool> HandleMessageAsync(string messageType, string message)
+    public void Dispose()
     {
-        try
-        {
-            switch (messageType)
-            {
-                case "MESSAGE_RECEIVED":
-                    var messageObject = JsonMessageSerializerHandler.Deserialize(message);
-                    var baseMessageObject = messageObject.ToObject<Message>();
-
-                    if (baseMessageObject is null)
-                    {
-                        Log.Error("Message type {MessageType} is not invalid", messageType);
-                        break;
-                    }
-                    
-                    _messageRepository.AddMessageAsync(baseMessageObject);
-                    Log.Information("Message type {MessageType} has been consumed", messageType);
-                    break;
-                default:
-                    // Handle the message
-                    Console.WriteLine($"Message type {messageType} not handled and has been ignored.");
-                    break;
-            }
-        } catch (Exception ex)
-        {
-            Log.Error("Error handling message: {ExMessage}", ex.Message);
-        }
-
-        return Task.FromResult(true);
+        _serviceBusConsumer.DisposeAsync();
     }
 }
