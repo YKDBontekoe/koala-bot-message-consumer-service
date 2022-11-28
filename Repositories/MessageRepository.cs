@@ -2,7 +2,6 @@ using Koala.MessageConsumerService.Models.Message;
 using Koala.MessageConsumerService.Options;
 using Koala.MessageConsumerService.Repositories.Interfaces;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace Koala.MessageConsumerService.Repositories;
@@ -21,8 +20,6 @@ public class MessageRepository : IMessageRepository
     public async Task AddMessageAsync(Message message)
     {
         var container = _database.GetContainer(_options.DatabaseName, _options.ContainerName);
-        await container.CreateItemAsync(
-            item: message,
-            partitionKey: new PartitionKey(message.Id));
+        await container.UpsertItemAsync(message);
     }
 }
