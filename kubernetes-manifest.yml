@@ -20,7 +20,7 @@ spec:
           restartPolicy: Always
           containers:
           - name: koala-message-consumer-service
-            image: ykdbonteregistry.azurecr.io/koala-message-consumer-service:v1
+            image: ykdbonteregistry.azurecr.io/koala-message-consumer-service:latest
             resources:
               requests:
                 cpu: 500m
